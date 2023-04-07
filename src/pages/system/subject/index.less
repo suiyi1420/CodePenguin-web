@@ -1,36 +1,51 @@
-.list_box{
-    width:230px;
-    height:310px;
-    margin-right:20px;
-    margin-bottom:20px;
-    float:left;
-    background:#fff;
-    .list_box_img{
-        width:100%;
-        height:160px;
-        img{width:100%;height:100%}
+.list_box {
+  position: relative;
+  float: left;
+  width: 230px;
+  height: 330px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  background: #fff;
+  cursor: pointer;
+  .list_box_img {
+    width: 100%;
+    height: 160px;
+    img {
+      width: 100%;
+      height: 100%;
     }
-    .list_box_context_box{
-        padding:15px;
-        width:100%;
-        height:150px;
-        color: rgba(0,0,0,.45);
-    }
-    .list_box_title{
-        overflow: hidden;
-        color: rgba(0,0,0,.85);
-        font-weight: 500;
-        font-size: 16px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-    .list_box_context{
-        overflow: hidden;
-        text-overflow: ellipsis;
-        -webkit-line-clamp: 2;
-        margin-bottom: 10px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        
-    }
+  }
+  .list_box_context_box {
+    width: 100%;
+    height: 170px;
+    padding: 15px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  .list_box_title {
+    overflow: hidden;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+    font-size: 16px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .list_box_context {
+    display: -webkit-box;
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .list_box_button {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    display: none;
+  }
+}
+.list_box:hover {
+  .list_box_button {
+    display: block;
+  }
 }

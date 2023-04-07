@@ -16,7 +16,11 @@ export default {
     '/profile/avatar/': {
       target: 'http://localhost:8080',
       changeOrigin: true,
-    }
+    },
+    '/profile/subject/': {
+      target: 'http://localhost:8080',
+      changeOrigin: true,
+    },
   },
   test: {
     '/api/': {

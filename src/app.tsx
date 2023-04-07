@@ -11,7 +11,7 @@ import type { RunTimeLayoutConfig } from 'umi';
 import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import { roleList } from '@/utils/valueEnum';
 import defaultSettings from '../config/defaultSettings';
 import { getUserInfo, getRoutersInfo } from './services/session';
 
@@ -31,6 +31,7 @@ export async function getInitialState(): Promise<{
   currentUser?: API.CurrentUser;
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  userConfig?: () => Promise<any>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -45,17 +46,44 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
+
+  const res = await fetch(defaultSettings.base + 'config.json');
+  const userConfig = await res.json();
+  console.log('userConfig', userConfig);
+  const stratchJs = () => {
+    fetch(userConfig['stratch-web'] + userConfig['stratch-js']).catch((e) =>
+      console.log(e.message),
+    );
+  };
+
+  stratchJs();
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
+    const url = window.location.href;
+
+    if (url == window.location.origin || url == window.location.origin + defaultSettings.base) {
+      let isStudent = false;
+      currentUser &&
+        currentUser.roles.map((item: any) => {
+          if (item.roleId === roleList['学生']) {
+            isStudent = true;
+          }
+        });
+      if (isStudent) {
+        history.push('/student');
+      }
+    }
     return {
       settings: defaultSettings,
       currentUser,
       fetchUserInfo,
+      userConfig,
     };
   }
   return {
     fetchUserInfo,
+    userConfig,
     settings: defaultSettings,
   };
 }
@@ -99,6 +127,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         }
         // initialState.currentUser 中包含了所有用户信息
         const menus = await getRoutersInfo();
+        // console.log('menusmenus', menus);
         setInitialState((preInitialState) => ({
           ...preInitialState,
           menus,

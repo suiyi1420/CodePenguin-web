@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Input, Form, Select, Modal, message, DatePicker } from 'antd';
-import { getAllStudent, addClass } from './service';
+import { getUserByRoleAndDept, addClass, editClass } from './service';
 import { getSubjectTypeList, getSubjectByTypeId } from '../subject/service';
 import moment from 'moment';
 
 const AddClassPage: React.FC = (props: any) => {
-  const { callBack, isModalOpen, handleCancel } = props;
+  const { callBack, isModalOpen, handleCancel, editRecord, formType } = props;
   const [addForm] = Form.useForm();
   const [teacherKeyWord, setTeacherKeyWord] = useState('');
   const [allTeacher, setAllTeacher] = useState<any[]>([]);
   const [subjectTypeList, setSubjectTypeList] = useState([]);
   const [subjectInfoList, setSubjectInfoList] = useState<any[]>([]);
   const getAllTeacherList = async () => {
-    const param = { keyWord: teacherKeyWord, id: 2 };
-    const res = await getAllStudent(param);
+    const param = { keyWord: teacherKeyWord, role_id: 4 };
+    const res = await getUserByRoleAndDept(param);
     console.log('res', res);
-    setAllTeacher((data) => res.rows);
+    setAllTeacher((data) => res.data);
   };
   useEffect(() => {
     getAllTeacherList();
@@ -23,6 +23,13 @@ const AddClassPage: React.FC = (props: any) => {
   useEffect(() => {
     getTypeList();
   }, []);
+  useMemo(() => {
+    if (formType == 1) {
+      editRecord['class_time'] = moment(editRecord['class_time']);
+      addForm.setFieldsValue(editRecord);
+    }
+    console.log('editRecord', editRecord);
+  }, [formType, editRecord]);
 
   async function getTypeList() {
     const res = await getSubjectTypeList();
@@ -42,13 +49,24 @@ const AddClassPage: React.FC = (props: any) => {
       .then((values) => {
         values['class_time'] = moment(values['class_time']).format('YYYY-MM-DD HH:mm:ss');
         console.log(values);
-        addClass(values)
-          .then((res) => {
-            close();
-            callBack();
-            handleCancel();
-          })
-          .catch((e) => message.error(e.message));
+        if (formType == 0) {
+          addClass(values)
+            .then((res) => {
+              close();
+              callBack();
+              handleCancel();
+            })
+            .catch((e) => message.error(e.message));
+        } else {
+          values['id'] = editRecord['id'];
+          editClass(values)
+            .then((res) => {
+              close();
+              callBack();
+              handleCancel();
+            })
+            .catch((e) => message.error(e.message));
+        }
       })
       .catch((e) => console.log(e.message));
   };
@@ -59,7 +77,12 @@ const AddClassPage: React.FC = (props: any) => {
   console.log('subjectInfoList', subjectInfoList);
   return (
     <>
-      <Modal title="添加班级" open={isModalOpen} onOk={onOk} onCancel={onCancel}>
+      <Modal
+        title={formType === 0 ? '添加班级' : '编辑班级'}
+        open={isModalOpen}
+        onOk={onOk}
+        onCancel={onCancel}
+      >
         <Form layout="inline" form={addForm}>
           <Form.Item
             label="班级名称"
@@ -69,7 +92,10 @@ const AddClassPage: React.FC = (props: any) => {
           >
             <Input placeholder="请输入班级名称" allowClear style={{ width: 220 }} />
           </Form.Item>
-          <Form.Item label="课程分类" style={{ marginBottom: 24 }}>
+          <Form.Item
+            label="课程分类"
+            style={{ marginBottom: 24, display: formType === 1 ? 'none' : '' }}
+          >
             <Select style={{ width: 220 }} onChange={(value) => getSubjectList(value)}>
               {subjectTypeList &&
                 subjectTypeList.map((item: any) => {
@@ -82,10 +108,10 @@ const AddClassPage: React.FC = (props: any) => {
             </Select>
           </Form.Item>
           <Form.Item
-            label="课程小节"
+            label="课程"
             name="subject_id"
-            rules={[{ required: true, message: '请选择课程小节!' }]}
-            style={{ marginBottom: 24 }}
+            rules={[{ required: formType == 0, message: '请选择课程!' }]}
+            style={{ marginBottom: 24, display: formType === 1 ? 'none' : '' }}
           >
             <Select style={{ width: 220 }}>
               {subjectInfoList.map((item: any) => {

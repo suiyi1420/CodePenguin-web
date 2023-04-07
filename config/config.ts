@@ -6,8 +6,14 @@ import routes from './routes';
 import proxy from './proxy';
 
 const { REACT_APP_ENV } = process.env;
-
+console.log('REACT_APP_ENV', REACT_APP_ENV);
+let base = '/';
+if (REACT_APP_ENV !== 'dev') {
+  base = '/admin/';
+}
 export default defineConfig({
+  base: base,
+  publicPath: base,
   hash: true,
   antd: {},
   dva: {
@@ -69,7 +75,5 @@ export default defineConfig({
   mfsu: {},
   webpack5: {},
   exportStatic: {},
-  externals: {
-  
-  }
+  externals: {},
 });

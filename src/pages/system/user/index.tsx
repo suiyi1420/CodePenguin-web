@@ -2,7 +2,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { FormInstance } from 'antd';
 import { Button, message, Modal, Row, Col } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
-import { useIntl, FormattedMessage, useAccess } from 'umi';
+import { useIntl, FormattedMessage, useAccess, useModel } from 'umi';
 import { FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -18,6 +18,7 @@ import {
   exportUser,
   updateUserPwd,
   getDeptTree,
+  getUserCreateCount,
 } from './service';
 import UpdateForm from './components/edit';
 import { getDict } from '../dict/service';
@@ -144,6 +145,8 @@ const handleExport = async () => {
 };
 
 const UserTableList: React.FC = () => {
+  const { initialState } = useModel('@@initialState');
+  const { currentUser } = initialState || {};
   const formTableRef = useRef<FormInstance>();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -153,7 +156,9 @@ const UserTableList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<UserType>();
   const [selectedRowsState, setSelectedRows] = useState<UserType[]>([]);
 
-  const [selectDept, setSelectDept] = useState<any>({ id: 0 });
+  const [selectDept, setSelectDept] = useState<any>({
+    id: (currentUser && currentUser.deptId) || 0,
+  });
 
   const [sexOptions, setSexOptions] = useState<any>([]);
   const [statusOptions, setStatusOptions] = useState<any>([]);
@@ -165,8 +170,14 @@ const UserTableList: React.FC = () => {
   const [roleList, setRoleList] = useState<string[]>();
   const [deptTree, setDeptTree] = useState<DataNode[]>();
 
+  const [teacher, setTeacher] = useState(0);
+  const [teacherTotal, setTeacherTotal] = useState(0);
+  const [student, setStudent] = useState(0);
+  const [studentTotal, setStudentTotal] = useState(0);
   const access = useAccess();
-
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSchoolMaster, setIsSchoolMaster] = useState(false);
+  const [maxRoleId, setMaxRoleId] = useState(1);
   /** 国际化配置 */
   const intl = useIntl();
 
@@ -199,7 +210,34 @@ const UserTableList: React.FC = () => {
         setRoleOptions(ropt);
       }
     });
+    getUserCreateCount().then((res) => {
+      if (res.code === 200) {
+        console.log('getUserCreateCount', res);
+        setStudent(res.data.student);
+        setStudentTotal(res.data.studentTotal);
+        setTeacher(res.data.teacher);
+        setTeacherTotal(res.data.teacherTotal);
+      }
+    });
   }, []);
+  useEffect(() => {
+    const rolesList = (currentUser && currentUser.roles) || [];
+    rolesList.map((item: any) => {
+      if (item.roleId === 1) {
+        setIsAdmin(true);
+      }
+      if (item.roleId === 3) {
+        setIsSchoolMaster(true);
+      }
+    });
+    const max = Math.max.apply(
+      Math,
+      rolesList.map((i) => {
+        return i.roleId;
+      }),
+    );
+    setMaxRoleId(max);
+  }, [currentUser]);
 
   const columns: ProColumns<UserType>[] = [
     {
@@ -260,7 +298,11 @@ const UserTableList: React.FC = () => {
           type="link"
           size="small"
           key="edit"
-          hidden={!access.hasPerms('system:user:edit')}
+          hidden={
+            !isAdmin &&
+            (!access.hasPerms('system:user:edit') ||
+              (currentUser && currentUser?.userId === record.userId))
+          }
           onClick={() => {
             const fetchUserInfo = async (userId: number) => {
               const res = await getUser(userId);
@@ -274,14 +316,29 @@ const UserTableList: React.FC = () => {
                 }),
               );
               setRoleIds(res.roleIds);
-              setRoleList(
-                res.roles.map((item: any) => {
-                  return {
-                    value: item.roleId,
-                    label: item.roleName,
-                  };
-                }),
-              );
+              // setRoleList(
+              //   res.roles.map((item: any) => {
+              //     return {
+              //       value: item.roleId,
+              //       label: item.roleName,
+              //     };
+              //   }),
+              // );
+              getRoleList({
+                roleId: !isAdmin ? maxRoleId + '' : '',
+              }).then((res) => {
+                console.log('121212131313');
+                if (res.code === 200) {
+                  setRoleList(
+                    res.rows.map((item: any) => {
+                      return {
+                        value: item.roleId,
+                        label: item.roleName,
+                      };
+                    }),
+                  );
+                }
+              });
             };
             fetchUserInfo(record.userId);
             getDeptTree({}).then((treeData) => {
@@ -298,7 +355,11 @@ const UserTableList: React.FC = () => {
           size="small"
           danger
           key="batchRemove"
-          hidden={!access.hasPerms('system:user:remove')}
+          hidden={
+            !isAdmin &&
+            (!access.hasPerms('system:user:remove') ||
+              (currentUser && currentUser?.userId === record.userId))
+          }
           onClick={async () => {
             Modal.confirm({
               title: '删除',
@@ -333,7 +394,7 @@ const UserTableList: React.FC = () => {
       ],
     },
   ];
-
+  // console.log('currentUser', currentUser);
   return (
     <WrapContent>
       <Row gutter={[16, 24]}>
@@ -363,6 +424,14 @@ const UserTableList: React.FC = () => {
               labelWidth: 120,
             }}
             toolBarRender={() => [
+              <>
+                {isSchoolMaster && (
+                  <>
+                    教师:{teacher}/{teacherTotal}&nbsp;&nbsp;&nbsp;&nbsp;学生:{student}/
+                    {studentTotal}&nbsp;&nbsp;&nbsp;&nbsp;
+                  </>
+                )}
+              </>,
               <Button
                 type="primary"
                 key="add"
@@ -388,7 +457,10 @@ const UserTableList: React.FC = () => {
                         );
                       }
                     });
-                    getRoleList().then((res) => {
+                    getRoleList({
+                      roleId: !isAdmin ? maxRoleId + '' : '',
+                    }).then((res) => {
+                      console.log('121212131313');
                       if (res.code === 200) {
                         setRoleList(
                           res.rows.map((item: any) => {

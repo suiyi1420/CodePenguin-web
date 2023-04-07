@@ -32,6 +32,8 @@ export type UserType = {
   roleIds: [];
   roles: [];
   searchValue: string;
+  teacher: number;
+  student: number;
 };
 
 export type UserListPagination = {

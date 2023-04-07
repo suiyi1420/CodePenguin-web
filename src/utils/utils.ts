@@ -25,7 +25,7 @@ export const isAntDesignProOrDev = (): boolean => {
 };
 
 export function trim(x: string) {
-  return x.replace(/^\s+|\s+$/gm,'');  
+  return x.replace(/^\s+|\s+$/gm, '');
 }
 
 /**
@@ -104,7 +104,7 @@ export function formatTreeSelectData(arrayList: any): DataNode[] {
       id: item.id,
       title: item.label,
       key: item.id,
-      value: item.id
+      value: item.id,
     } as DataNode;
     if (item.children) {
       node.children = formatTreeSelectData(item.children);
@@ -115,5 +115,18 @@ export function formatTreeSelectData(arrayList: any): DataNode[] {
 }
 
 export function download(fileName: string) {
-	window.location.href = `/common/download?fileName=${encodeURI(fileName)}&delete=${  true}`;
+  window.location.href = `/common/download?fileName=${encodeURI(fileName)}&delete=${true}`;
+}
+
+export function dataURLtoBlob(dataurl: string) {
+  const arr = dataurl.split(','); //分割为数组，分割到第一个逗号
+  const mime = arr[0].match(/:(.*?);/)[1]; //获取分割后的base64前缀中的类型
+  console.log('mime', mime);
+  const bstr = window.atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
 }

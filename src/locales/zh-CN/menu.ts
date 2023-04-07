@@ -57,6 +57,7 @@ export default {
   'menu.title.class': '班级管理',
   'menu.title.classSubject': '班级课程',
   'menu.title.classStudent': '学生列表',
+  'menu.title.student': '学生页面',
   'menu.title.subject': '课程管理',
   'menu.title.subjectInfo': '课程详情',
   'menu.title.dict': '字典管理',

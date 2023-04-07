@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import { Table, Button, Input, Form, DatePicker, Select, Modal, message } from 'antd';
-import { getClassSubjectList, editClassSubject, addClassSubject } from '../../service';
-import { getSubjectInfoById } from '../../../subject/service';
+import {
+  getClassSubjectList,
+  editClassSubject,
+  addClassSubject,
+  deleteClassSubject,
+} from '../../service';
+import { getSubjectInfoListById } from '../../../subject/service';
 import WrapContent from '@/components/WrapContent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { useAccess } from 'umi';
 const { RangePicker } = DatePicker;
 
 const ClassInfo: React.FC = ({ location }) => {
@@ -16,6 +22,7 @@ const ClassInfo: React.FC = ({ location }) => {
   const [classList, setClassList] = useState<any>([]);
   const [classTime, setClassTime] = useState<any[] | null>(null);
   const [subjectInfoList, setSubjectInfoList] = useState<any[]>([]);
+  const access = useAccess();
   const columns = [
     {
       title: '序号',
@@ -25,13 +32,13 @@ const ClassInfo: React.FC = ({ location }) => {
         return parseInt(index + 1);
       },
     },
+    // {
+    //   title: '课时名称',
+    //   dataIndex: 'rel_name',
+    //   key: 'rel_name',
+    // },
     {
       title: '课时名称',
-      dataIndex: 'rel_name',
-      key: 'rel_name',
-    },
-    {
-      title: '录播课课时名称',
       dataIndex: 'name',
       key: 'name',
     },
@@ -54,6 +61,7 @@ const ClassInfo: React.FC = ({ location }) => {
             <Button
               type="primary"
               ghost
+              hidden={!access.hasPerms('system:class_subject:edit')}
               onClick={() => {
                 //console.log('record', { ...record });
                 const initValue = { ...record, open_time: moment(record.open_time) };
@@ -136,6 +144,7 @@ const ClassInfo: React.FC = ({ location }) => {
               type="primary"
               ghost
               danger
+              hidden={!access.hasPerms('system:class_subject:delete')}
               onClick={() => {
                 Modal.confirm({
                   icon: <ExclamationCircleOutlined />,
@@ -145,10 +154,10 @@ const ClassInfo: React.FC = ({ location }) => {
                     editForm.validateFields().then((values) => {
                       const param = {
                         id: record.id,
-                        status: 0,
+                        class_id: classId,
                       };
                       console.log('Success:', param);
-                      editClassSubject(param)
+                      deleteClassSubject(param)
                         .then((res) => {
                           close();
                           getList();
@@ -174,7 +183,7 @@ const ClassInfo: React.FC = ({ location }) => {
     getSubjectInfoList();
   }, []);
   async function getSubjectInfoList() {
-    const res = await getSubjectInfoById(subjectId);
+    const res = await getSubjectInfoListById(subjectId);
     console.log('res', res);
     if (res.data && res.data.length > 0) {
       setSubjectInfoList(res.data);
@@ -190,8 +199,8 @@ const ClassInfo: React.FC = ({ location }) => {
     };
     const res = await getClassSubjectList(param);
     console.log('res', res);
-    if (res.rows && res.rows.length > 0) {
-      setClassList(res.rows);
+    if (res.data && res.data.length > 0) {
+      setClassList(res.data);
     }
   }
 
@@ -212,6 +221,7 @@ const ClassInfo: React.FC = ({ location }) => {
             <Form.Item>
               <Button
                 type="primary"
+                hidden={!access.hasPerms('system:class_subject:add')}
                 onClick={() => {
                   Modal.confirm({
                     icon: <></>,
@@ -225,13 +235,13 @@ const ClassInfo: React.FC = ({ location }) => {
                           form={addForm}
                           autoComplete="off"
                         >
-                          <Form.Item
+                          {/* <Form.Item
                             label="课程小节名称"
                             name="rel_name"
                             rules={[{ required: true, message: '请输入课程小节名称!' }]}
                           >
                             <Input placeholder="请输入课程小节名称" />
-                          </Form.Item>
+                          </Form.Item> */}
                           <Form.Item
                             label="选择上课时间"
                             name="open_time"
@@ -244,8 +254,10 @@ const ClassInfo: React.FC = ({ location }) => {
                             label="选择课程小节"
                             name="subject_info_id"
                             rules={[{ required: true, message: '选择课程小节!' }]}
+                            initialValue={-1}
                           >
                             <Select style={{ width: 220 }}>
+                              <Select.Option value={-1}>全部</Select.Option>
                               {subjectInfoList &&
                                 subjectInfoList.map((item: any) => {
                                   return (
@@ -261,21 +273,32 @@ const ClassInfo: React.FC = ({ location }) => {
                     ),
                     onOk(close) {
                       addForm.validateFields().then((values) => {
-                        const param = {
-                          class_id: classId,
-                          open_time: values.open_time.format('YYYY-MM-DD HH:mm:ss'),
-                          rel_name: values.rel_name,
-                          subject_info_id: values.subject_info_id,
-                          status: 1,
+                        const postRequest = (values, subject_info_id) => {
+                          const param = {
+                            class_id: classId,
+                            open_time: values.open_time.format('YYYY-MM-DD HH:mm:ss'),
+                            rel_name: values.rel_name,
+                            subject_info_id: subject_info_id,
+                            status: 1,
+                            subject_id: subjectId,
+                          };
+                          console.log('Success:', param);
+                          addClassSubject(param)
+                            .then((res) => {
+                              close();
+                              addForm.resetFields();
+                              getList();
+                            })
+                            .catch((e) => message.error(e.message));
                         };
-                        console.log('Success:', param);
-                        addClassSubject(param)
-                          .then((res) => {
-                            close();
-                            addForm.resetFields();
-                            getList();
-                          })
-                          .catch((e) => message.error(e.message));
+                        if (values.subject_info_id === -1) {
+                          subjectInfoList &&
+                            subjectInfoList.map((item) => {
+                              postRequest(values, item.subject_info_id);
+                            });
+                        } else {
+                          postRequest(values, values.subject_info_id);
+                        }
                       });
                     },
                     onCancel() {
@@ -289,7 +312,7 @@ const ClassInfo: React.FC = ({ location }) => {
             </Form.Item>
           </Form>
         </p>
-        <Table columns={columns} dataSource={classList} />
+        <Table columns={columns} dataSource={classList} pagination={false} />
       </div>
     </WrapContent>
   );

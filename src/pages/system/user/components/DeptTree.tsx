@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tree, message } from 'antd';
 import { getDeptTree } from '../service';
+import { useModel } from 'umi';
 
 const { DirectoryTree } = Tree;
 
@@ -8,9 +9,8 @@ const { DirectoryTree } = Tree;
  *
  * @author whiteshader@163.com
  * @datetime  2021/09/16
- * 
+ *
  * */
-
 
 export type TreeProps = {
   onSelect: (values: any) => Promise<void>;
@@ -20,11 +20,13 @@ const DeptTree: React.FC<TreeProps> = (props) => {
   const [treeData, setTreeData] = useState<any>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+  const { initialState } = useModel('@@initialState');
+  const { currentUser } = initialState || {};
 
   const fetchDeptList = async () => {
     const hide = message.loading('正在查询');
     try {
-      await getDeptTree({}).then((res: any) => {
+      await getDeptTree({ deptId: currentUser?.deptId }).then((res: any) => {
         const exKeys = [];
         exKeys.push('1');
         setTreeData(res);

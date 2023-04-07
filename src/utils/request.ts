@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
 import { extend } from 'umi-request';
+import progressMiddleware from 'umi-request-progress';
 import { history } from 'umi';
 import { message, notification } from 'antd';
 import { clearSessionToken, getAccessToken, getRefreshToken, getTokenExpireTime } from '../access';
@@ -46,12 +47,12 @@ const errorHandler = (error: { response: Response }): Response => {
   return response;
 };
 
-function createClient () {
+function createClient() {
   /** 配置request请求时的默认参数 */
   return extend({
     errorHandler, // 默认错误处理
     credentials: 'include', // 默认请求是否带上cookie
-    prefix: defaultSettings.apiBasePath
+    prefix: defaultSettings.apiBasePath,
   });
 }
 
@@ -59,7 +60,7 @@ const request = createClient();
 
 // 更换令牌的时间区间
 const checkRegion = 5 * 60 * 1000;
-
+request.use(progressMiddleware, { core: true });
 request.interceptors.request.use((url: string, options: any) => {
   // console.log('-------------------------')
   console.log('request:', url);
@@ -102,8 +103,9 @@ request.interceptors.request.use((url: string, options: any) => {
 request.interceptors.response.use(async (response: Response) => {
   const { status } = response;
   if (status === 401 || status === 403) {
-    const msg = codeMessage[status] || codeMessage[10000]
-    message.warn(`${status} ${msg}`)
+    const msg = codeMessage[status] || codeMessage[10000];
+    message.warn(`${status} ${msg}`);
+    history.push(`${defaultSettings.base}`);
   }
   //  else if (status === 200) {
   //   const contentType = response.headers.get('content-type');

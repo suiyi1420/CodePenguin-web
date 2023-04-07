@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Input, Form, Select, Modal, message } from 'antd';
-import { getClassStudent, getAllStudent, deleteClassStudent } from '../../service';
+import { getClassStudent, deleteClassStudent } from '../../service';
 import WrapContent from '@/components/WrapContent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import AddStudent from './add';
+import { useAccess } from 'umi';
 
-const { Search } = Input;
 const Student: React.FC = ({ location }) => {
   const classId = location.state.classId;
   const [studentList, setStudentList] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const access = useAccess();
   const columns = [
     {
       title: '序号',
@@ -49,6 +50,7 @@ const Student: React.FC = ({ location }) => {
               type="primary"
               ghost
               danger
+              hidden={!access.hasPerms('system:student:delete')}
               onClick={() => {
                 Modal.confirm({
                   icon: <ExclamationCircleOutlined />,
@@ -80,7 +82,7 @@ const Student: React.FC = ({ location }) => {
   async function getList() {
     const res = await getClassStudent(classId);
     console.log('res', res);
-    setStudentList(res.rows);
+    setStudentList(res.data);
   }
 
   return (
@@ -89,6 +91,7 @@ const Student: React.FC = ({ location }) => {
         <p>
           <Button
             type="primary"
+            hidden={!access.hasPerms('system:student:add')}
             onClick={() => {
               setIsOpen(true);
             }}

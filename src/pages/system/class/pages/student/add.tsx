@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Form, Select, Modal, message } from 'antd';
-import { getAllStudent, addClassStudent } from '../../service';
+import { getUserByRoleAndDept, addClassStudent } from '../../service';
 
 const { Search } = Input;
 const AddStudent: React.FC = (props: any) => {
@@ -14,10 +14,10 @@ const AddStudent: React.FC = (props: any) => {
     getAllStudentList(keyWord);
   }, [keyWord]);
   async function getAllStudentList(name: any) {
-    const param = { keyWord: name, id: 3 };
-    const res = await getAllStudent(param);
+    const param = { keyWord: name, role_id: 5 };
+    const res = await getUserByRoleAndDept(param);
     console.log('res', res);
-    setAllStudent(res.rows);
+    setAllStudent(res.data);
   }
 
   const onOk = () => {

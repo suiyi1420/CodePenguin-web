@@ -7,7 +7,7 @@ import {
   ProFormTreeSelect,
 } from '@ant-design/pro-form';
 import { Form, Modal, Row, Col } from 'antd';
-import { useIntl, FormattedMessage } from 'umi';
+import { useIntl, FormattedMessage, useModel } from 'umi';
 import type { UserType } from '../data.d';
 import type { DataNode } from 'antd/lib/tree';
 
@@ -15,9 +15,8 @@ import type { DataNode } from 'antd/lib/tree';
  *
  * @author whiteshader@163.com
  * @datetime  2021/09/16
- * 
+ *
  * */
-
 
 export type UserFormValueType = Record<string, unknown> & Partial<UserType>;
 
@@ -36,19 +35,31 @@ export type UserFormProps = {
 };
 
 const UserForm: React.FC<UserFormProps> = (props) => {
+  const { initialState } = useModel('@@initialState');
+  const { currentUser } = initialState || {};
   const [form] = Form.useForm();
-
+  console.log('currentUser', currentUser?.deptId);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [userId, setUserId] = useState<any>('');
-
+  const user_roles = Form.useWatch('roleIds', form);
   const { sexOptions, statusOptions } = props;
   const { roles, posts, depts } = props;
 
   useEffect(() => {
+    const rolesList = (currentUser && currentUser.roles) || [];
+    rolesList.map((item: any) => {
+      if (item.roleId === 1) {
+        setIsAdmin(true);
+      }
+    });
+  }, [currentUser]);
+  useEffect(() => {
+    console.log(form.getFieldsValue());
     form.resetFields();
     setUserId(props.values.userId);
     form.setFieldsValue({
       userId: props.values.userId,
-      deptId: props.values.deptId,
+      deptId: props.values.deptId || currentUser?.deptId,
       postIds: props.postIds,
       roleIds: props.roleIds,
       userName: props.values.userName,
@@ -67,6 +78,8 @@ const UserForm: React.FC<UserFormProps> = (props) => {
       createTime: props.values.createTime,
       updateBy: props.values.updateBy,
       updateTime: props.values.updateTime,
+      teacher: props.values.teacher,
+      student: props.values.student,
       remark: props.values.remark,
     });
   }, [form, props]);
@@ -74,6 +87,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
   const intl = useIntl();
   const handleOk = () => {
     form.submit();
+    console.log('handleOk', form.getFieldsValue());
   };
   const handleCancel = () => {
     props.onCancel();
@@ -140,6 +154,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
           </Col>
           <Col span={12} order={2}>
             <ProFormTreeSelect
+              hidden={!isAdmin}
               name="deptId"
               label={intl.formatMessage({
                 id: 'system.User.dept_id',
@@ -234,7 +249,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
               placeholder="请输入密码"
               rules={[
                 {
-                  required: false,
+                  required: !userId,
                   message: <FormattedMessage id="请输入密码！" defaultMessage="请输入密码！" />,
                 },
               ]}
@@ -322,8 +337,8 @@ const UserForm: React.FC<UserFormProps> = (props) => {
           <Col span={12} order={2}>
             <ProFormSelect
               name="roleIds"
-              mode="multiple"
               width="xl"
+              mode="multiple"
               label={intl.formatMessage({
                 id: 'role',
                 defaultMessage: '角色',
@@ -334,6 +349,48 @@ const UserForm: React.FC<UserFormProps> = (props) => {
             />
           </Col>
         </Row>
+        {user_roles && user_roles.includes(2) ? (
+          <Row gutter={[16, 16]}>
+            <Col span={12} order={1}>
+              <ProFormText
+                name="teacher"
+                label="教师账号数量"
+                width="xl"
+                placeholder="请输入教师账号数量"
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="请输入教师账号数量"
+                        defaultMessage="请输入教师账号数量"
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </Col>
+            <Col span={12} order={2}>
+              <ProFormText
+                name="student"
+                label="学生账号数量"
+                width="xl"
+                placeholder="请输入学生账号数量"
+                rules={[
+                  {
+                    required: false,
+                    message: (
+                      <FormattedMessage
+                        id="请输入学生账号数量"
+                        defaultMessage="请输入学生账号数量"
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </Col>
+          </Row>
+        ) : null}
         <Row gutter={[16, 16]}>
           <Col span={24} order={1}>
             <ProFormTextArea

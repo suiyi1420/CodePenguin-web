@@ -15,7 +15,8 @@ import { getCaptchaImage, getFakeCaptcha, login } from '@/services/login';
 
 import styles from './index.less';
 import { clearSessionToken, setSessionToken } from '@/access';
-
+import defaultSettings from '../../../../config/defaultSettings';
+import { roleList } from '@/utils/valueEnum';
 const LoginMessage: React.FC<{
   content: string;
 }> = ({ content }) => (
@@ -47,6 +48,7 @@ const Login: React.FC = () => {
         currentUser: userInfo,
       }));
     }
+    return userInfo;
   };
   const getCaptchaCode = async () => {
     const response = await getCaptchaImage();
@@ -69,14 +71,20 @@ const Login: React.FC = () => {
         setSessionToken(response.token, response.token, expireTime);
         message.success(defaultLoginSuccessMessage);
 
-        await fetchUserInfo();
+        const userInfo = await fetchUserInfo();
         /** 此方法会跳转到 redirect 参数所在的位置 */
         if (!history) return;
 
         const { query } = history.location;
         const { redirect } = query as { redirect: string };
         history.push(redirect || '/');
+        console.log('login*************', userInfo);
+        if (userInfo.roleId === roleList['学生']) {
+          history.push('/student');
+        }
         return;
+      } else if (response.code === 403) {
+        history.push(`${defaultSettings.base}`);
       } else {
         console.log('login failed');
         clearSessionToken();
@@ -107,7 +115,7 @@ const Login: React.FC = () => {
         {/* {SelectLang && <SelectLang />} */}
       </div>
       <div className={styles.logo}>
-        <img alt="logo" src="/logo.svg" />
+        <img alt="logo" src={`${defaultSettings.base}logo.svg`} />
       </div>
       <div className={styles.content}>
         <LoginForm
@@ -153,14 +161,14 @@ const Login: React.FC = () => {
             <>
               <ProFormText
                 name="username"
-                initialValue="admin"
+                initialValue=""
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined className={styles.prefixIcon} />,
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin',
+                  defaultMessage: '用户名',
                 })}
                 rules={[
                   {
@@ -176,14 +184,14 @@ const Login: React.FC = () => {
               />
               <ProFormText.Password
                 name="password"
-                initialValue="admin123"
+                initialValue=""
                 fieldProps={{
                   size: 'large',
                   prefix: <LockOutlined className={styles.prefixIcon} />,
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码: admin123',
+                  defaultMessage: '密码',
                 })}
                 rules={[
                   {

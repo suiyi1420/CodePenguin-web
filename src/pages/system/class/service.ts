@@ -1,13 +1,6 @@
 import request from '@/utils/request';
 import type { QueryParamsType, ClassSubjectType } from '../../../utils/queryParams';
 
-/* *
- *
- * @author whiteshader@163.com
- * @datetime  2021/09/16
- *
- * */
-
 // 查询角色信息列表
 export async function getClassList(params?: QueryParamsType) {
   return request(`/system/class/list`, {
@@ -30,12 +23,19 @@ export async function editClassSubject(params?: ClassSubjectType) {
   });
 }
 
+export async function deleteClassSubject(params: any) {
+  return request('/system/class/subject/delete/' + params.class_id + '/' + params.id, {
+    method: 'POST',
+  });
+}
+
 export async function editClass(params?: any) {
   return request(`/system/class/edit`, {
     data: params,
     method: 'POST',
   });
 }
+
 export async function addClassSubject(params?: ClassSubjectType) {
   return request(`/system/class/subject/add`, {
     data: params,
@@ -43,7 +43,7 @@ export async function addClassSubject(params?: ClassSubjectType) {
   });
 }
 
-export async function deleteClassSubject(id?: number) {
+export async function deleteClass(id?: number) {
   return request(`/system/class/delete/${id}`, {
     method: 'POST',
   });
@@ -55,6 +55,7 @@ export async function deleteClassStudent(id?: number, params: any) {
     data: params,
   });
 }
+
 export async function getClassStudent(id?: number) {
   return request(`/system/class/list/student/${id}`, {
     method: 'POST',
@@ -77,6 +78,13 @@ export async function addClassStudent(params?: QueryParamsType) {
 
 export async function addClass(params?: any) {
   return request(`/system/class/add`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+export async function getUserByRoleAndDept(params: any) {
+  return request(`/system/user/get_user_by_role_and_dept`, {
     method: 'POST',
     data: params,
   });

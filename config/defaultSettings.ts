@@ -1,14 +1,20 @@
 import { Settings as LayoutSettings } from '@ant-design/pro-layout';
-
+const { REACT_APP_ENV } = process.env;
+console.log('REACT_APP_ENV2', REACT_APP_ENV);
+let base = '/';
+if (REACT_APP_ENV !== 'dev') {
+  base = '/admin/';
+}
 const Settings: LayoutSettings & {
   pwa?: boolean;
   logo?: string;
   tabsLayout?: boolean;
   apiBasePath?: string;
+  base?: string;
 } = {
   navTheme: 'light',
   headerTheme: 'light',
-  primaryColor: '#722ED1',
+  primaryColor: '#1890ff',
   layout: 'mix',
   splitMenus: true,
   contentWidth: 'Fluid',
@@ -17,10 +23,11 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: '',
   pwa: false,
-  logo: '/pro_icon.svg',
+  logo: base + 'pro_icon.svg',
   iconfontUrl: '',
   tabsLayout: true,
   apiBasePath: '/api',
+  base: base,
 };
 
 export default Settings;

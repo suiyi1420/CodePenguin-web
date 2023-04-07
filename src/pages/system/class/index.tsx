@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import { Table, Button, Input, Form, DatePicker, Select, Modal, message } from 'antd';
-import { getClassList, deleteClassSubject } from './service';
+import { getClassList, deleteClass } from './service';
 import { getSubjectByTypeId } from '../subject/service';
 import WrapContent from '@/components/WrapContent';
-import { history } from 'umi';
+import { history, useAccess } from 'umi';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import EditClassPage from './edit';
 import AddClassPage from './add';
@@ -17,9 +17,10 @@ const ClassList: React.FC = () => {
   const [classTime, setClassTime] = useState<any[] | null>(null);
   const [teacher, setTeacher] = useState<string>('');
   const [subjectList, setSubjectList] = useState<any[]>([]);
-  const [deleteClassId, setDEleteClassId] = useState(0);
+  const [editRecord, setRditRecord] = useState({});
+  const [formType, setFormType] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const access = useAccess();
   const columns = [
     {
       title: '序号',
@@ -73,7 +74,7 @@ const ClassList: React.FC = () => {
               type="dashed"
               onClick={() => {
                 history.push({
-                  pathname: '/system/classSubject',
+                  pathname: '/system/class/classSubject',
                   state: {
                     classId: record.id,
                     subjectId: record.subject_id,
@@ -88,7 +89,7 @@ const ClassList: React.FC = () => {
               type="dashed"
               onClick={() => {
                 history.push({
-                  pathname: '/system/classStudent',
+                  pathname: '/system/class/classStudent',
                   state: {
                     classId: record.id,
                   },
@@ -101,8 +102,11 @@ const ClassList: React.FC = () => {
             <Button
               type="primary"
               ghost
+              hidden={!access.hasPerms('system:class:edit')}
               onClick={() => {
-                setDEleteClassId(record.id);
+                console.log('record', record);
+                setRditRecord(record);
+                setFormType(1);
                 setIsOpen(true);
               }}
             >
@@ -113,6 +117,7 @@ const ClassList: React.FC = () => {
               type="primary"
               ghost
               danger
+              hidden={!access.hasPerms('system:class:delete')}
               onClick={() => {
                 Modal.confirm({
                   icon: <ExclamationCircleOutlined />,
@@ -120,7 +125,7 @@ const ClassList: React.FC = () => {
                   content: '是否确定删除该班级？',
                   onOk(close) {
                     console.log('Success:', record.id);
-                    deleteClassSubject(record.id)
+                    deleteClass(record.id)
                       .then((res) => {
                         close();
                         getList();
@@ -162,8 +167,8 @@ const ClassList: React.FC = () => {
       teacher: teacher,
     };
     const res = await getClassList(param);
-    console.log('res', res);
-    setClassList(res.rows);
+    console.log('setClassList', res);
+    setClassList(res.data);
   }
 
   return (
@@ -215,7 +220,8 @@ const ClassList: React.FC = () => {
               <Button
                 type="primary"
                 onClick={() => {
-                  setIsAddOpen(true);
+                  setFormType(0);
+                  setIsOpen(true);
                 }}
               >
                 新增班级
@@ -225,19 +231,14 @@ const ClassList: React.FC = () => {
         </p>
         <Table columns={columns} dataSource={classList} />
       </div>
+
       {isOpen ? (
-        <EditClassPage
-          deleteClassId={deleteClassId}
+        <AddClassPage
+          editRecord={editRecord}
+          formType={formType}
           callBack={getList}
           isModalOpen={isOpen}
           handleCancel={() => setIsOpen(false)}
-        />
-      ) : null}
-      {isAddOpen ? (
-        <AddClassPage
-          callBack={getList}
-          isModalOpen={isAddOpen}
-          handleCancel={() => setIsAddOpen(false)}
         />
       ) : null}
     </WrapContent>

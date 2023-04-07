@@ -1,3 +1,4 @@
 {
-    "stratch-web":"http://localhost:8601/"
+    "stratch-web":"/scratch",
+    "stratch-js":"/lib.min.js"
 }
