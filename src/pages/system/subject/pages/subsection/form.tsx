@@ -29,6 +29,7 @@ const SubsectionFormPage: React.FC = (props: any) => {
   const onOk = () => {
     addForm.validateFields().then((values) => {
       values['subject_info_id'] = subjectInfoId;
+      values['status'] = 1;
       console.log(values);
       if (type == commonFormType.添加) {
         addSubjectSubsection(values)
@@ -95,7 +96,7 @@ const SubsectionFormPage: React.FC = (props: any) => {
           >
             <Input />
           </Form.Item>
-          <Form.Item label="上传类型" style={{ marginBottom: 24 }}>
+          <Form.Item label="上传类型" name="type" style={{ marginBottom: 24 }}>
             <Select
               style={{ width: 220 }}
               onChange={(value) => setUploadType(value)}
@@ -111,6 +112,7 @@ const SubsectionFormPage: React.FC = (props: any) => {
                     视频+sb3文件
                   </Select.Option>
                   <Select.Option value={subjectSubsectionType.仅sb3}>仅sb3</Select.Option>
+                  <Select.Option value={subjectSubsectionType.仅视频}>仅视频</Select.Option>
                 </>
               )}
 
@@ -133,7 +135,7 @@ const SubsectionFormPage: React.FC = (props: any) => {
               style={{ marginBottom: 24 }}
             >
               <SubsectionUpload
-                type="video"
+                type={'video/subjectInfoId' + subjectInfoId}
                 callBack={(value) => addForm.setFieldValue('video_url', value)}
               />
             </Form.Item>
@@ -153,7 +155,7 @@ const SubsectionFormPage: React.FC = (props: any) => {
               style={{ marginBottom: 24 }}
             >
               <SubsectionUpload
-                type="sb3"
+                type={'sb3/subjectInfoId' + subjectInfoId}
                 callBack={(value) => addForm.setFieldValue('file_url', value)}
               />
             </Form.Item>

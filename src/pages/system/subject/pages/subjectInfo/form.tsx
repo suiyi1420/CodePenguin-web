@@ -131,7 +131,7 @@ const SubjectInfoFormPage: React.FC = (props: any) => {
               style={{ marginBottom: 24 }}
             >
               <SubsectionUpload
-                type="video"
+                type={'video/subject_id' + subject_id}
                 callBack={(value) => addForm.setFieldValue('url', value)}
               />
             </Form.Item>
