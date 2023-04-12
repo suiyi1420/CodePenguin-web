@@ -212,7 +212,7 @@ const SubjectInfot: React.FC = ({ location }) => {
               type="primary"
               ghost
               danger
-              hidden={!access.hasPerms('system:class_subject:delete')}
+              hidden={!access.hasPerms('system:subject_info:delete')}
               onClick={() => {
                 Modal.confirm({
                   icon: <ExclamationCircleOutlined />,
