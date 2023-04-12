@@ -110,3 +110,9 @@ export async function deleteSubjectSubsection(id) {
     method: 'post',
   });
 }
+
+export async function deleteSubjectInfo(id) {
+  return request('/system/subject/subject_info/delete/' + id, {
+    method: 'post',
+  });
+}

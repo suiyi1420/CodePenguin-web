@@ -4,6 +4,11 @@ export const subjectInfoType = {
   课程视频: 2,
   // 课程课件: 3,
 };
+export const subjectInfoTypeMapper = {
+  [subjectInfoType.编程小节]: '编程小节',
+  [subjectInfoType.视频小节]: '视频小节',
+  [subjectInfoType.课程视频]: '课程视频',
+};
 export const subjectSubsectionType = {
   '视频+sb3文件': 0,
   仅视频: 1,

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
-import { Table, Button, Input } from 'antd';
+import { Table, Button, Input, message, Modal } from 'antd';
 import styles from '../../index.less';
 
 import type { Subject } from '../../data';
-import { getSubjectInfoListById } from '../../service';
+import { getSubjectInfoListById, deleteSubjectInfo } from '../../service';
 import WrapContent from '@/components/WrapContent';
 import { history, useAccess, useModel } from 'umi';
 import SubjectInfoFormPage from './form';
-import VideoModal from '@/pages/system/video/VideoPdf';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { subjectInfoType, videoPageType } from '@/utils/valueEnum';
 import defaultSettings from '../../../../../../config/defaultSettings';
-import { commonFormType } from '@/utils/valueEnum';
+import { commonFormType, subjectInfoTypeMapper } from '@/utils/valueEnum';
 
 /* *
  *
@@ -80,7 +80,7 @@ const SubjectInfot: React.FC = ({ location }) => {
       key: 'type',
       width: '10%',
       render: (text) => {
-        return text;
+        return subjectInfoTypeMapper[text];
       },
     },
     {
@@ -102,97 +102,142 @@ const SubjectInfot: React.FC = ({ location }) => {
             >
               编辑课程
             </Button>
-            &nbsp;&nbsp;&nbsp;&nbsp;
             {record && record.pdf_url && record.pdf_url !== '' && (
-              <Button
-                type="primary"
-                onClick={() => {
-                  // setFileType(videoPageType.pdf);
-                  // setVideo_url(record.url);
-                  // setIsModalOpen2(true);
-                  let uri = defaultSettings.base + '/video_pdf';
-                  uri = uri.replaceAll('//', '/');
-                  window.open(
-                    window.location.origin +
-                      uri +
-                      '?subjectInfoId=' +
-                      record.subject_info_id +
-                      '&type=' +
-                      videoPageType.pdf,
-                  );
-                }}
-              >
-                课程课件
-              </Button>
+              <>
+                &nbsp;
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    // setFileType(videoPageType.pdf);
+                    // setVideo_url(record.url);
+                    // setIsModalOpen2(true);
+                    let uri = defaultSettings.base + '/video_pdf';
+                    uri = uri.replaceAll('//', '/');
+                    window.open(
+                      window.location.origin +
+                        uri +
+                        '?subjectInfoId=' +
+                        record.subject_info_id +
+                        '&type=' +
+                        videoPageType.pdf,
+                    );
+                  }}
+                >
+                  课程课件
+                </Button>
+              </>
             )}
-            &nbsp;&nbsp;&nbsp;&nbsp;
             {record &&
               (record.type == subjectInfoType['编程小节'] ||
                 record.type == subjectInfoType['视频小节']) && (
-                <Button
-                  type="dashed"
-                  onClick={() => {
-                    history.push({
-                      pathname: '/system/subject/subjectInfo/subsection',
-                      state: {
-                        subjectInfoId: record.subject_info_id,
-                        subjectInfoType: record.type,
-                      },
-                    });
-                  }}
-                  hidden={!access.hasPerms('system:subject_subsection:list')}
-                >
-                  查看小节
-                </Button>
+                <>
+                  &nbsp;
+                  <Button
+                    type="dashed"
+                    onClick={() => {
+                      history.push({
+                        pathname: '/system/subject/subjectInfo/subsection',
+                        state: {
+                          subjectInfoId: record.subject_info_id,
+                          subjectInfoType: record.type,
+                        },
+                      });
+                    }}
+                    hidden={!access.hasPerms('system:subject_subsection:list')}
+                  >
+                    查看小节
+                  </Button>
+                </>
               )}
-            &nbsp;&nbsp;&nbsp;&nbsp;
             {record && record.type == subjectInfoType['课程视频'] && (
-              <Button
-                type="primary"
-                onClick={() => {
-                  // setFileType(videoPageType.video);
-                  // setVideo_url(record.url);
-                  // setIsModalOpen2(true);
-                  let uri = defaultSettings.base + '/video_pdf';
-                  uri = uri.replaceAll('//', '/');
-                  window.open(
-                    window.location.origin +
-                      uri +
-                      '?subjectInfoId=' +
-                      record.subject_info_id +
-                      '&type=' +
-                      videoPageType.video,
-                  );
-                }}
-              >
-                挑战课程
-              </Button>
+              <>
+                &nbsp;
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    // setFileType(videoPageType.video);
+                    // setVideo_url(record.url);
+                    // setIsModalOpen2(true);
+                    let uri = defaultSettings.base + '/video_pdf';
+                    uri = uri.replaceAll('//', '/');
+                    window.open(
+                      window.location.origin +
+                        uri +
+                        '?subjectInfoId=' +
+                        record.subject_info_id +
+                        '&type=' +
+                        videoPageType.video,
+                    );
+                  }}
+                >
+                  挑战课程
+                </Button>
+              </>
             )}
             {record && record.type == subjectInfoType['视频小节'] && (
-              <Button
-                type="primary"
-                onClick={() => {
-                  console.log('defaultSettings.base', defaultSettings.base);
-                  let uri = defaultSettings.base + '/video';
-                  uri = uri.replaceAll('//', '/');
-                  window.open(
-                    window.location.origin + uri + '?subjectInfoId=' + record.subject_info_id,
-                  );
-                }}
-              >
-                挑战课程
-              </Button>
+              <>
+                &nbsp;
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    console.log('defaultSettings.base', defaultSettings.base);
+                    let uri = defaultSettings.base + '/video';
+                    uri = uri.replaceAll('//', '/');
+                    window.open(
+                      window.location.origin + uri + '?subjectInfoId=' + record.subject_info_id,
+                    );
+                  }}
+                >
+                  挑战课程
+                </Button>
+              </>
             )}
             {record && record.type == subjectInfoType['编程小节'] && (
-              <Button
-                type="primary"
-                onClick={() => {
-                  window.open(stratchWeb + '?subject_info_id=' + text + '&access=' + access_token);
-                }}
-              >
-                挑战课程
-              </Button>
+              <>
+                &nbsp;
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    window.open(
+                      stratchWeb + '?subject_info_id=' + text + '&access=' + access_token,
+                    );
+                  }}
+                >
+                  挑战课程
+                </Button>
+              </>
             )}
+            &nbsp;
+            <Button
+              type="primary"
+              ghost
+              danger
+              hidden={!access.hasPerms('system:class_subject:delete')}
+              onClick={() => {
+                Modal.confirm({
+                  icon: <ExclamationCircleOutlined />,
+                  title: '删除课程',
+                  content: '是否确定删除该课程？',
+                  onOk(close) {
+                    deleteSubjectInfo(text)
+                      .then((res) => {
+                        console.log('res', res);
+                        if (res.code == 200 || res.code == '200') {
+                          message.success('删除成功');
+                          getList();
+                          close();
+                        } else {
+                          message.warning(res.msg);
+                        }
+                      })
+                      .catch((e) => message.error(e.message));
+                  },
+                  onCancel() {},
+                });
+              }}
+            >
+              删除课程
+            </Button>
           </>
         );
       },
