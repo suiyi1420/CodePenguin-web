@@ -3,10 +3,13 @@ import { Modal, Button, Form, Select, Input, Upload, Image, message } from 'antd
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadSubjectFile } from '../../service';
 import { uploadAccess } from '@/utils/valueEnum';
-
-const SubsectionUpload: React.FC = (props: any) => {
-  const { type, callBack } = props;
-  const [base64, setBase64] = useState('');
+type Iprops = {
+  type: string;
+  callBack: (data: any) => void;
+  uploadPath: string;
+};
+const SubsectionUpload: React.FC<{ props: Iprops }> = (props: Iprops) => {
+  const { type, callBack, uploadPath } = props;
   const [fileList, setFileList] = useState([]);
   const acceptType = uploadAccess[type];
   const uploadProps = {
@@ -38,7 +41,7 @@ const SubsectionUpload: React.FC = (props: any) => {
     customRequest({ file, filename, onError, onProgress, onSuccess, withCredentials }) {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('type', type);
+      formData.append('type', uploadPath);
       uploadSubjectFile(formData, {
         //上传进度事件的回调函数
         onReqProgress: function (ev: ProgressEvent) {

@@ -7,13 +7,13 @@ import proxy from './proxy';
 
 const { REACT_APP_ENV } = process.env;
 console.log('REACT_APP_ENV', REACT_APP_ENV);
-let base = '/';
-if (REACT_APP_ENV !== 'dev') {
-  base = '/admin/';
-}
+// let base = '/';
+// if (REACT_APP_ENV !== 'dev') {
+//   base = '/admin/';
+// }
 export default defineConfig({
-  base: base,
-  publicPath: base,
+  base: defaultSettings.base,
+  publicPath: defaultSettings.base,
   hash: true,
   antd: {},
   dva: {

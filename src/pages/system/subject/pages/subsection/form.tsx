@@ -135,7 +135,8 @@ const SubsectionFormPage: React.FC = (props: any) => {
               style={{ marginBottom: 24 }}
             >
               <SubsectionUpload
-                type={'video/subjectInfoId' + subjectInfoId}
+                type="video"
+                uploadPath={'video/subjectInfoId' + subjectInfoId}
                 callBack={(value) => addForm.setFieldValue('video_url', value)}
               />
             </Form.Item>
@@ -155,7 +156,8 @@ const SubsectionFormPage: React.FC = (props: any) => {
               style={{ marginBottom: 24 }}
             >
               <SubsectionUpload
-                type={'sb3/subjectInfoId' + subjectInfoId}
+                type="sb3"
+                uploadPath={'sb3/subjectInfoId' + subjectInfoId}
                 callBack={(value) => addForm.setFieldValue('file_url', value)}
               />
             </Form.Item>

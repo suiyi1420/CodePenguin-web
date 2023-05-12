@@ -143,6 +143,7 @@ const AddSubjectPage: React.FC = (props: any) => {
           >
             <SubsectionUpload
               type="image"
+              uploadPath="image"
               callBack={(value) => {
                 addForm.setFieldValue('image', value);
                 let url = defaultSettings.base + value;

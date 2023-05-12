@@ -1,10 +1,13 @@
 import { Settings as LayoutSettings } from '@ant-design/pro-layout';
-const { REACT_APP_ENV } = process.env;
-console.log('REACT_APP_ENV2', REACT_APP_ENV);
-let base = '/';
-if (REACT_APP_ENV !== 'dev') {
-  base = '/admin/';
-}
+const { REACT_APP_ENV, NODE_ENV } = process.env;
+// console.log('REACT_APP_ENV2', REACT_APP_ENV);
+// let base;
+// if (REACT_APP_ENV != 'dev') {
+//   base = '/admin/';
+// } else {
+//   base = '/';
+// }
+// console.log('base', base);
 const Settings: LayoutSettings & {
   pwa?: boolean;
   logo?: string;
@@ -23,11 +26,12 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: '',
   pwa: false,
-  logo: base + 'pro_icon.svg',
+  logo: NODE_ENV + '' == 'development' ? '/' : '/admin/' + 'pro_icon.svg',
   iconfontUrl: '',
   tabsLayout: true,
   apiBasePath: '/api',
-  base: base,
+  base: NODE_ENV + '' == 'development' ? '/' : '/admin/',
 };
-
+console.log(Settings);
+console.log('REACT_APP_ENV2', process.env);
 export default Settings;
