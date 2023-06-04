@@ -11,7 +11,12 @@ import SubjectInfoFormPage from './form';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { subjectInfoType, videoPageType } from '@/utils/valueEnum';
 import defaultSettings from '../../../../../../config/defaultSettings';
-import { commonFormType, subjectInfoTypeMapper } from '@/utils/valueEnum';
+import {
+  commonFormType,
+  subjectInfoTypeMapper,
+  getKeyByValue,
+  saveFileType,
+} from '@/utils/valueEnum';
 
 /* *
  *
@@ -48,7 +53,7 @@ const SubjectInfot: React.FC = ({ location }) => {
       title: '序号',
       dataIndex: 'num',
       key: 'num',
-      width: '5%',
+      width: '3%',
       render: (text, record, index) => {
         return parseInt(index + 1);
       },
@@ -63,13 +68,13 @@ const SubjectInfot: React.FC = ({ location }) => {
       title: '课时内容',
       dataIndex: 'context',
       key: 'context',
-      width: '20%',
+      width: '18%',
     },
     {
       title: '知识点',
       dataIndex: 'knowledge',
       key: 'knowledge',
-      width: '20%',
+      width: '18%',
       render: (text) => {
         return <Input.TextArea value={text} autoSize bordered={false} />;
       },
@@ -78,9 +83,18 @@ const SubjectInfot: React.FC = ({ location }) => {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
-      width: '10%',
+      width: '6%',
       render: (text) => {
         return subjectInfoTypeMapper[text];
+      },
+    },
+    {
+      title: '文件保存类型',
+      dataIndex: 'save_file_type',
+      key: 'save_file_type',
+      width: '10%',
+      render: (text) => {
+        return getKeyByValue(saveFileType, text);
       },
     },
     {

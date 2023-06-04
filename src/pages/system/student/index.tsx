@@ -65,7 +65,7 @@ const Student: React.FC = () => {
       render: (text, record, index) => {
         return (
           <>
-            {record && record.pdf_url && record.pdf_url !== '' && (
+            {/* {record && record.pdf_url && record.pdf_url !== '' && (
               <Button
                 type="primary"
                 onClick={() => {
@@ -86,7 +86,7 @@ const Student: React.FC = () => {
               >
                 课程课件
               </Button>
-            )}
+            )} */}
             {record && record.type == subjectInfoType['课程视频'] && (
               <Button
                 type="primary"
@@ -232,12 +232,16 @@ const Student: React.FC = () => {
                   onClick={() => {
                     selectSubject(item.subject_id);
                   }}
+                  style={{
+                    background: 'url(' + item.image + ') no-repeat center center',
+                    backgroundSize: '100% 100%',
+                  }}
                 >
-                  <div className={styles['list_box_context_box']}>
+                  {/* <div className={styles['list_box_context_box']}>
                     <div className={styles['list_box_title']}>{item.subject_name}</div>
                     <div className={styles['list_box_context']}>{item.subject_context}</div>
                     <div className={styles['list_box_time']}>共{item.class_time}课时</div>
-                  </div>
+                  </div> */}
                 </div>
               );
             })}

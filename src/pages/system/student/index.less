@@ -9,8 +9,11 @@
   overflow: hidden;
 }
 .list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   float: left;
-  width: 255px;
+  width: 265px;
   height: 100%;
   overflow-y: auto;
   border-right: 1px solid #cccc;
@@ -18,11 +21,11 @@
 .list_box {
   float: left;
   width: 230px;
-  height: 140px;
-  margin-right: 20px;
-  margin-bottom: 20px;
-  background: #fff;
-  border: 6px solid #2284f1;
+  height: 160px;
+  // margin-right: 20px;
+  margin-top: 20px;
+  // background: #fff;
+  // border: 6px solid #2284f1;
   border-radius: 8px;
 }
 .list_box_context_box {
@@ -49,13 +52,7 @@
 }
 
 .list_box_active {
-  background-color: #7cc7ff;
-  .list_box_title {
-    color: #fff;
-  }
-  .list_box_context_box {
-    color: #fff;
-  }
+  box-shadow: 0 0 20px 0px #838383;
 }
 .subject_list {
   float: left;

@@ -3,7 +3,7 @@ import { Modal, Button, Form, Select, Input, Upload, Image, message } from 'antd
 
 import { addSubjectInfo, editSubjectInfo } from '../../service';
 import SubsectionUpload from '../subsection/upload';
-import { subjectInfoType, commonFormType } from '@/utils/valueEnum';
+import { subjectInfoType, commonFormType, saveFileType } from '@/utils/valueEnum';
 
 const SubjectInfoFormPage: React.FC = (props: any) => {
   const [addForm] = Form.useForm();
@@ -57,8 +57,8 @@ const SubjectInfoFormPage: React.FC = (props: any) => {
       >
         <Form
           form={addForm}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 20 }}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
           style={{ maxWidth: 600 }}
         >
           <Form.Item
@@ -138,6 +138,31 @@ const SubjectInfoFormPage: React.FC = (props: any) => {
               />
             </Form.Item>
           ) : null}
+          <Form.Item
+            label="小节保存模式"
+            name="save_file_type"
+            style={{ marginBottom: 24 }}
+            rules={[
+              {
+                required: type == commonFormType.添加 ? true : false,
+                message: '请选择小节保存模式！!',
+              },
+            ]}
+            initialValue={0}
+          >
+            <Select
+              style={{ width: 220 }}
+              onChange={(value) => setUploadType(value)}
+              defaultValue={saveFileType['所有小节一个文件']}
+            >
+              <Select.Option value={saveFileType['所有小节一个文件']}>
+                所有小节一个文件
+              </Select.Option>
+              <Select.Option value={saveFileType['每一小节一个文件']}>
+                每一小节一个文件
+              </Select.Option>
+            </Select>
+          </Form.Item>
         </Form>
       </Modal>
     </>
