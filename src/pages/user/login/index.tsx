@@ -33,8 +33,10 @@ const LoginMessage: React.FC<{
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<any>({});
   const [type, setType] = useState<string>('account');
+  
   const { initialState, setInitialState } = useModel('@@initialState');
-
+  const{isMobile}=initialState || {}
+  console.log("isMobile2",initialState)
   const [captchaCode, setCaptchaCode] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
 
@@ -79,6 +81,9 @@ const Login: React.FC = () => {
         const { redirect } = query as { redirect: string };
         history.push(redirect || '/');
         console.log('login*************', userInfo);
+        if(isMobile){
+          history.push('/trends');
+        }
         if (userInfo.roleId === roleList['学生']) {
           history.push('/student');
         }
@@ -94,6 +99,7 @@ const Login: React.FC = () => {
         getCaptchaCode();
       }
     } catch (error) {
+      console.log('login failed', error)
       clearSessionToken();
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',

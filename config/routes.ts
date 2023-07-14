@@ -464,6 +464,22 @@ export default [
     component: 'system/student/index',
   },
   {
+    path: '/trends',
+    layout: false,
+    component: 'system/trends/index',
+  },
+  {
+    path: '/trendsform',
+    layout: false,
+    component: 'system/trends/component/trendsForm/index',
+  },
+  {
+    path: '/trendsinfo',
+    layout: false,
+    component: 'system/trends/component/trendsInfo',
+  },
+  
+  {
     path: '/video',
     component: 'system/video/VideoPage',
   },

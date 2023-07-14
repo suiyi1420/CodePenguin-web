@@ -32,6 +32,8 @@ export async function getInitialState(): Promise<{
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
   userConfig?: () => Promise<any>;
+  isStudent?: boolean;
+  isMobile?: boolean;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -50,6 +52,8 @@ export async function getInitialState(): Promise<{
   const res = await fetch(defaultSettings.base + 'config.json');
   const userConfig = await res.json();
   console.log('userConfig', userConfig);
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||false;
+  console.log("isMobile",isMobile)
   const stratchJs = () => {
     fetch(userConfig['stratch-web'] + userConfig['stratch-js']).catch((e) =>
       console.log(e.message),
@@ -57,34 +61,49 @@ export async function getInitialState(): Promise<{
   };
 
   stratchJs();
+  
+
   // 如果是登录页面，不执行
-  if (history.location.pathname !== loginPath) {
+  if (!window.location.href.includes(loginPath)) {
     const currentUser = await fetchUserInfo();
     const url = window.location.href;
-
-    if (url == window.location.origin || url == window.location.origin + defaultSettings.base) {
-      let isStudent = false;
-      currentUser &&
+    let isStudent = false;
+    console.log("currentUser.roles",currentUser.roles)
+    currentUser &&
         currentUser.roles.map((item: any) => {
           if (item.roleId === roleList['学生']) {
             isStudent = true;
           }
         });
-      if (isStudent) {
-        history.push('/student');
-      }
+    if (url == window.location.origin || url == window.location.origin + defaultSettings.base) {
+      
+      
+        if (isMobile) {
+          console.log("This is a mobile device");
+          history.push('/trends');
+        } else {
+          console.log("This is a desktop device");
+          if (isStudent) {
+            history.push('/student');
+          }
+        }
+      
     }
+    console.log("isStudent",isStudent)
     return {
       settings: defaultSettings,
       currentUser,
       fetchUserInfo,
       userConfig,
+      isStudent:isStudent,
+      isMobile:isMobile
     };
   }
   return {
     fetchUserInfo,
     userConfig,
     settings: defaultSettings,
+    isMobile:isMobile
   };
 }
 
@@ -138,21 +157,23 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     // 增加一个 loading 的状态
+    //隐藏悬浮设置框
     childrenRender: (children, props) => {
       return (
         <div>
           {children}
           {!props.location?.pathname?.includes('/login') && (
-            <SettingDrawer
-              enableDarkTheme
-              settings={initialState?.settings}
-              onSettingChange={(settings) => {
-                setInitialState((preInitialState) => ({
-                  ...preInitialState,
-                  settings,
-                }));
-              }}
-            />
+            <></>
+            // <SettingDrawer
+            //   enableDarkTheme
+            //   settings={initialState?.settings}
+            //   onSettingChange={(settings) => {
+            //     setInitialState((preInitialState) => ({
+            //       ...preInitialState,
+            //       settings,
+            //     }));
+            //   }}
+            // />
           )}
         </div>
       );

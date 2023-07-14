@@ -15,7 +15,7 @@ export default defineConfig({
   base: defaultSettings.base,
   publicPath: defaultSettings.base,
   hash: true,
-  antd: {},
+  antd: {mobile:false},
   dva: {
     hmr: true,
   },

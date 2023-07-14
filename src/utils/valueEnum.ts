@@ -53,3 +53,8 @@ export const getKeyByValue = (object: any, value: any) => {
     }
   }
 };
+
+export const fileType={
+  视频:1,
+  图片:0
+}
