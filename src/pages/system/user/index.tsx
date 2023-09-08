@@ -271,7 +271,7 @@ const UserTableList: React.FC = () => {
       hideInSearch: true,
     },
     {
-      title: <FormattedMessage id="system.User.email" defaultMessage="用户邮箱" />,
+      title: <FormattedMessage id="system.User.email" defaultMessage="课程" />,
       dataIndex: 'email',
       valueType: 'text',
       hideInSearch: true,

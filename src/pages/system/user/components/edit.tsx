@@ -201,15 +201,15 @@ const UserForm: React.FC<UserFormProps> = (props) => {
               name="email"
               label={intl.formatMessage({
                 id: 'system.User.email',
-                defaultMessage: '用户邮箱',
+                defaultMessage: '课程',
               })}
               width="xl"
-              placeholder="请输入用户邮箱"
+              placeholder="请输入课程"
               rules={[
                 {
                   required: false,
                   message: (
-                    <FormattedMessage id="请输入用户邮箱！" defaultMessage="请输入用户邮箱！" />
+                    <FormattedMessage id="请输入课程！" defaultMessage="请输入课程！" />
                   ),
                 },
               ]}

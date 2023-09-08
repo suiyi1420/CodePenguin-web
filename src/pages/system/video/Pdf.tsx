@@ -97,7 +97,7 @@ const PdfPage: React.FC = (props: any) => {
     );
   };
   return (
-    <Worker workerUrl={'https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js'}>
+    <Worker workerUrl={`${defaultSettings.base}static/js/pdf.worker.min.js`}>
       <div style={{ height: 'calc(100vh - 94px - 48px)' }}>
         {/* <Viewer fileUrl={url} plugins={[defaultLayoutPluginInstance]} initialPage={0}></Viewer> */}
         {viewer()}

@@ -11,7 +11,7 @@ export default {
   'system.User.user_name': '用户账号',
   'system.User.nick_name': '用户昵称',
   'system.User.user_type': '用户类型',
-  'system.User.email': '用户邮箱',
+  'system.User.email': '课程',
   'system.User.phonenumber': '手机号码',
   'system.User.sex': '用户性别',
   'system.User.avatar': '头像地址',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo ,useRef} from 'react';
-
+import{Upload,message} from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import styles from '../../index.less';
 import {
   Form,
@@ -10,7 +11,7 @@ import {
   DatePicker,
   Selector,Space,Grid,Radio,
   Slider,
-  Stepper,
+  ImageViewer,
   SearchBar,
   CheckList, Popup,
   Cascader,CascadePicker,ImageUploader,Toast
@@ -31,7 +32,8 @@ import {
 } from '../../../user/service';
 import type { DataNode } from 'antd/lib/tree';
 import { history, useModel } from 'umi';
-import { set } from 'lodash';
+import {compressImage,CompressorVideo} from '../../../../../utils/compressImage';
+
 
 const TrendsForm: React.FC = () => {
   const { initialState } = useModel('@@initialState');
@@ -165,6 +167,7 @@ const TrendsForm: React.FC = () => {
 
   const onFinish = (values: any) => {
     console.log(values,fileList)
+    // const url_list=file_url_list.map(item=>item.url)
     form.validateFields().then(async (values) => {
       console.log(values)
       const subject=values.subject
@@ -172,7 +175,7 @@ const TrendsForm: React.FC = () => {
       values.subjectTypeId=subject[0]
       values.subjectId=subject[1]
       values.subjectInfoId=subject[2]
-      values.fileUrl=JSON.stringify(fileList)
+      values.fileUrl=JSON.stringify(file_url_list)
       values.userIds=userIds.join(',')
       values.createUserId=currentUser.userId;
       const res = await addTrendsList(values);
@@ -183,37 +186,140 @@ const TrendsForm: React.FC = () => {
     })
   }
 
-  const mockUpload = async (file) => {
-     console.log("file",file)
-    //   const time=Date.now()
-    //   console.log(time)
-    //   const name=file.name
-    //   file.name=time+name
+  // const mockUpload = async (file) => {
+  //    console.log("file",file)
+  //   //   const time=Date.now()
+  //   //   console.log(time)
+  //   //   const name=file.name
+  //   //   file.name=time+name
+  //     const formData = new FormData();
+  //     formData.append('file', file);
+  //     formData.append('type', "trends");
+  //     const res=await uploadFile(formData);
+  //     if (res.code == 200 && res.url !== '') {
+  //       return{
+  //         relUrl: res.url,
+  //         type:file.type,
+  //         url:URL.createObjectURL(file)
+  //       }
+  //     }
+    
+  // }
+  
+  // const beforeUpload = (file) => {
+  //   console.log(file)
+  //   const time=Date.now()
+  //   const name=time+file.name
+  //   const newFile = new File([file], name,{type: file.type, lastModified: file.lastModified});
+  //   return newFile
+  // }
+  console.log("fileList",fileList)
+
+  const uploadProps = {
+    multiple: true,
+    accept: 'image/*,video/*',
+    listType:"picture-card",
+    fileList,
+    maxCount: 9,
+    async beforeUpload (file) {
+      console.log("beforeUpload",file)
+      const time=Date.now()
+      let name=time+file.name
+      let newFile=null;
+      if(file.type.includes("video")){
+        const nameArray=file.name.split(".")
+        name=name.replace(nameArray[nameArray.length-1],"mp4") 
+        //因微信浏览器的限制，视频的压缩则放在后端处理
+        newFile = new File([file], name,{type: 'video/mp4', lastModified: file.lastModified});
+        // await CompressorVideo(file);
+        // console.log("newFile",newFile)
+        
+      }else if(file.type.includes("image")){
+        //先压缩图片再上传
+        const compress_img=await compressImage(file,0.5)
+        newFile = new File([compress_img], name,{type: file.type, lastModified: file.lastModified});
+      }
+      console.log("newFile2",newFile)
+      return newFile
+    },
+    onChange(info: any) {
+      console.log('onChange', info);
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        console.log(`${info.file.name} 文件上传成功`);
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} 文件上传失败`);
+      }
+      setFileList([...info.fileList]);
+    },
+    onPreview(file){
+      
+      if(file.type.includes("image")){
+        const curFile=file_url_list.find(i=>i.name===file.name)
+        console.log("curFile",curFile);
+        ImageViewer.show({ image: curFile.url });
+      }
+      
+    },
+    onRemove(file){
+      const list=file_url_list.filter(i=>i.name!==file.name)
+      setFileUrlList(list)
+    },
+
+    onStart(file) {
+      console.log('onStart', file, file.name);
+    },
+
+    onError(err) {
+      console.log('onError', err);
+    },
+
+    customRequest({ file, filename, onError, onProgress, onSuccess, withCredentials }) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', "trends");
-      const res=await uploadFile(formData);
-      if (res.code == 200 && res.url !== '') {
-        return{
-          relUrl: res.url,
-          type:file.type,
-          url:URL.createObjectURL(file)
-        }
-      }
-    
-  }
-
-  const beforeUpload = (file) => {
-    console.log(file)
-    const time=Date.now()
-    const name=time+file.name
-    const newFile = new File([file], name,{type: file.type, lastModified: file.lastModified});
-    return newFile
-  }
-  console.log("fileList",fileList)
+      uploadFile(formData, {
+        //上传进度事件的回调函数
+        onReqProgress: function (ev: ProgressEvent) {
+          console.log('onReqProgress', Math.round((ev.loaded / ev.total) * 100).toFixed(2));
+          onProgress({ percent: Math.round((ev.loaded / ev.total) * 100).toFixed(2) }, file);
+        },
+      })
+        .then((res) => {
+          setTimeout(() => {
+            onSuccess();
+          });
+          if (res.code == 200 && res.url !== '') {
+            const m={name:file.name,
+              relUrl: res.url,
+              type:file.type,
+              url:URL.createObjectURL(file)
+          
+                    }
+            setFileUrlList((old)=>[...old,m])
+            // const list=fileList.map(item=>{
+            //   if(item.file.uid==file.uid){
+            //     item.url=res.url
+            //   }
+            // })
+            // setFileList([...list])
+          }
+        })
+        .catch(onError=>{
+          
+        });
+      return {
+        abort() {
+          console.log('upload progress is aborted.');
+        },
+      };
+    },
+  };
   return (
     <>
-      
+      <div className={styles["trendsForm"]}>
       <Form
       style={{'--border-top':"none"}}
         name='form'
@@ -319,8 +425,17 @@ const TrendsForm: React.FC = () => {
         </Form.Item>
         
         
-        <Form.Item  label='附件' >
-        <ImageUploader
+        <Form.Item  label='附件' layout="vertical">
+        <Upload className={styles['upload-img']}
+        {...uploadProps}
+        
+      >
+        {fileList.length >= 9 ? null : (<div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>上传</div>
+    </div>)}
+      </Upload>
+        {/* <ImageUploader
         accept={'image/*,video/*'}
       value={fileList}
       onChange={setFileList}
@@ -332,9 +447,10 @@ const TrendsForm: React.FC = () => {
       onCountExceed={exceed => {
         Toast.show(`超出附件数量限制！`)
       }}
-    />
+    /> */}
         </Form.Item>
       </Form>
+      </div>
       <Popup
         visible={visible}
         onMaskClick={() => {

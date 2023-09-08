@@ -62,9 +62,10 @@ export async function getInitialState(): Promise<{
 
   stratchJs();
   
-
+  const resp = await getUserInfo();
+  console.log("resp,",resp)
   // 如果是登录页面，不执行
-  if (!window.location.href.includes(loginPath)) {
+  if (resp&& resp.code === 200) {
     const currentUser = await fetchUserInfo();
     const url = window.location.href;
     let isStudent = false;
@@ -76,18 +77,16 @@ export async function getInitialState(): Promise<{
           }
         });
     if (url == window.location.origin || url == window.location.origin + defaultSettings.base) {
-      
-      
-        if (isMobile) {
-          console.log("This is a mobile device");
-          history.push('/trends');
-        } else {
-          console.log("This is a desktop device");
-          if (isStudent) {
-            history.push('/student');
-          }
-        }
-      
+
+    }
+    if (isMobile) {
+      console.log("This is a mobile device");
+      history.push('/trends');
+    } else {
+      console.log("This is a desktop device");
+      if (isStudent) {
+        history.push('/student');
+      }
     }
     console.log("isStudent",isStudent)
     return {

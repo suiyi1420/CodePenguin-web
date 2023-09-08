@@ -257,7 +257,33 @@ export default [
           },
         ],
       },
-
+      {
+        name:'system_trends',
+        path: '/system/trends',
+        routes:[
+          {
+            name: 'system_trendslist',
+            path: '/system/trends/trendslist',
+            component: 'system/trends/index',
+            // access: 'authorize',
+                wrappers: ['@/components/KeepAlive'],
+                KeepAlive: false,
+                title: 'menu.title.system_trendslist',
+          },
+          {
+            name: 'system_trendsform',
+            path: '/system/trends/trendsform',
+            component: 'system/trends/component/trendsForm/index',
+            // access: 'authorize',
+                wrappers: ['@/components/KeepAlive'],
+                KeepAlive: false,
+                title: 'menu.title.system_trendsform',
+          },
+        ]
+        
+      },
+      
+      
       {
         name: 'dict',
         icon: 'PartitionOutlined',

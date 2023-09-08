@@ -7,13 +7,16 @@ import { getTrendsList, deleteTrends } from './service';
 import moment from 'moment';
 import { MoreOutline, CameraOutline } from 'antd-mobile-icons'
 import VideoPlayer from '@/pages/system/video/VideoPlayer';
+import {loginOut} from '@/components/RightContent/AvatarDropdown';
 import {
   CameraFilled
 } from '@ant-design/icons';
 import TrendsInfo from './component/trendsInfo';
 
 import { history, useModel,Helmet } from 'umi';
-import { set } from 'lodash';
+import {
+  HomeFilled,ArrowLeftOutlined 
+} from '@ant-design/icons';
 
 const Trends: React.FC = () => {
   const { initialState } = useModel('@@initialState');
@@ -138,7 +141,9 @@ const Trends: React.FC = () => {
           } else {
             node.push(
               <Grid.Item key={item.relUrl}>
-                <VideoPlayer src={item.relUrl} className={styles["video-css"]} style={{height:file_url_list.length<=3?(imgRef.current?.clientWidth*0.75)/(file_url_list.length):(imgRef.current?.clientWidth*0.75)/3}}/>
+                <VideoPlayer src={item.relUrl} className={styles["video-css"]} width={imgRef.current?.clientWidth}
+                height={file_url_list.length<=3?(imgRef.current?.clientWidth*0.75)/(file_url_list.length):(imgRef.current?.clientWidth*0.75)/3}
+                 style={{height:file_url_list.length<=3?(imgRef.current?.clientWidth*0.75)/(file_url_list.length):(imgRef.current?.clientWidth*0.75)/3}}/>
               </Grid.Item>
             )
           }
@@ -178,8 +183,14 @@ const Trends: React.FC = () => {
       }}
       >
       <div className={styles["bg"]} style={{backgroundImage: `url("${defaultSettings.base}static/img/trends_bg.jpg") `}}>
+        <div className={styles["bg-logout"]}>
+          <ArrowLeftOutlined   style={{ color: "#fff", fontSize: 24 }} onClick={() => { loginOut()}}/>
+        </div>
         <div className={styles["bg-edit"]}>
           {!isStudent && <CameraFilled style={{ color: "#fff", fontSize: 24 }} onClick={() => { history.push("/trendsform") }} />}
+        </div>
+        <div className={styles["bg-home"]}>
+          {!isStudent && <HomeFilled  style={{ color: "#fff", fontSize: 24 }} onClick={() => { history.push("/") }} />}
         </div>
         <div className={styles["bg-name"]}>
           <strong>{currentUser?.nickName}</strong>
@@ -266,7 +277,7 @@ const Trends: React.FC = () => {
               <TrendsInfo data={popupData} onCancle={()=>setPopupVisible(false)}/>
             </Popup>
 
-    </>
+            </>
   );
 };
 

@@ -1,7 +1,27 @@
 .trends-item {
     --align-items: "flex-start";
 }
+.trendsForm {
+    margin:30px 20px;
+    :global{
+        .adm-list-header {
+            padding: 0;
+          }
+          
+    }
+    
+}
+.upload-img{
+    width:100%;
+    overflow: hidden;
+    :global{
+    .ant-upload-list-picture-card-container{
 
+        width:30%;
+        // height:33vw;
+    }
+}
+}
 .header_button {
     overflow: hidden;
     display: flex;
@@ -78,6 +98,18 @@
         position: absolute;
         top: 12px;
         right: 12px;
+        z-index: 1;
+    }
+    .bg-home {
+        position: absolute;
+        top: 52px;
+        right: 12px;
+        z-index: 1;
+    }
+    .bg-logout {
+        position: absolute;
+        top: 12px;
+        left: 12px;
         z-index: 1;
     }
 }
