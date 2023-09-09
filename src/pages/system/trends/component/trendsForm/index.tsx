@@ -34,8 +34,8 @@ import type { DataNode } from 'antd/lib/tree';
 import { history, useModel } from 'umi';
 import {compressImage,CompressorVideo} from '../../../../../utils/compressImage';
 
-
-const TrendsForm: React.FC = () => {
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||false;
+const TrendsForm: React.FC = (props:any) => {
   const { initialState } = useModel('@@initialState');
   const { currentUser, isStudent } = initialState || {};
   const [form] = Form.useForm();
@@ -181,7 +181,14 @@ const TrendsForm: React.FC = () => {
       const res = await addTrendsList(values);
       if (res.code == 200) {
         Toast.show('发表成功');
-        history.push('/trends')
+        if(isMobile){
+          history.push('/trends')
+        }else{
+          props.callBack(Math.random())
+          form.resetFields();
+          setFileList([]);
+        }
+        
       }
     })
   }

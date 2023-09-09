@@ -39,7 +39,6 @@ const Login: React.FC = () => {
   console.log("isMobile2",initialState)
   const [captchaCode, setCaptchaCode] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
-
   const intl = useIntl();
 
   const fetchUserInfo = async () => {
@@ -64,6 +63,8 @@ const Login: React.FC = () => {
       // 登录
       const response = await login({ ...values, uuid });
       if (response.code === 200) {
+        localStorage.setItem("userName",values.username);
+        localStorage.setItem("password",values.password);
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
@@ -127,6 +128,8 @@ const Login: React.FC = () => {
         <LoginForm
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
+            username:localStorage.getItem("userName")||"",
+            password:localStorage.getItem("password")||"",
             autoLogin: true,
           }}
           actions={

@@ -1,27 +1,32 @@
 .trends-item {
     --align-items: "flex-start";
 }
+
 .trendsForm {
-    margin:30px 20px;
-    :global{
+    margin: 30px 20px;
+
+    :global {
         .adm-list-header {
             padding: 0;
-          }
-          
-    }
-    
-}
-.upload-img{
-    width:100%;
-    overflow: hidden;
-    :global{
-    .ant-upload-list-picture-card-container{
+        }
 
-        width:30%;
-        // height:33vw;
+    }
+
+}
+
+.upload-img {
+    width: 100%;
+    overflow: hidden;
+
+    :global {
+        .ant-upload-list-picture-card-container {
+
+            width: 30%;
+            // height:33vw;
+        }
     }
 }
-}
+
 .header_button {
     overflow: hidden;
     display: flex;
@@ -29,27 +34,31 @@
     padding: 12px;
     background-color: #dbdbdb;
 }
+
 .searchBarContainer {
     padding: 12px;
     border-bottom: solid 1px var(--adm-color-border);
-  }
-  
-  .checkListContainer {
+}
+
+.checkListContainer {
     height: 300px;
     overflow-y: scroll;
-  }
-  
-  .myCheckList {
+}
+
+.myCheckList {
     --border-top: 0;
     --border-bottom: 0;
-  }
+}
+
 .video-css {
     width: 100%;
     height: 100%;
+
     video {
         width: 100%;
         height: 100%;
     }
+
     .poster {
         width: 100%;
         height: 100%;
@@ -64,7 +73,7 @@
             z-index: 1;
         }
 
-        
+
     }
 
 }
@@ -100,16 +109,57 @@
         right: 12px;
         z-index: 1;
     }
+
     .bg-home {
         position: absolute;
         top: 52px;
         right: 12px;
         z-index: 1;
     }
+
     .bg-logout {
         position: absolute;
         top: 12px;
         left: 12px;
         z-index: 1;
+    }
+}
+
+.trehds-pc {
+    padding: 20px;
+
+    .trehds-pc-item {
+        margin-top: 50px;
+        background: #fff;
+        width:47%;
+        height: 75vh;
+        padding: 20px;
+        border-radius: 5px;
+        overflow: auto;
+
+        .title {
+            padding: 10px 0px;
+            height: 40px;
+            border-bottom: 2px solid #ccc;
+            box-sizing: border-box;
+            
+            strong {
+                border-left: 2px solid rgb(101, 101, 255)
+            }
+        }
+
+        .trehds-pc-item-box {
+            height: calc(100% - 40px);
+            overflow: auto;
+            width: 100%;
+        }
+    }
+
+    .left {
+        float: left;
+    }
+
+    .right {
+        float: right;
     }
 }

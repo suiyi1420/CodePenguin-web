@@ -24,7 +24,7 @@ const AddStudent: React.FC = (props: any) => {
     const param = { class_id: classId, user_id: selectStudent };
     addClassStudent(param)
       .then((res) => {
-        close();
+        handleCancel();
         addForm.resetFields();
         callBack();
         handleCancel();
